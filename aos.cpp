@@ -16,8 +16,11 @@
 #include<bits/stdc++.h>
 #include<sys/ioctl.h>
 #include<errno.h>
+#include<fcntl.h>
+#include<sys/sendfile.h>
 using namespace std;
 
+vector<string>vv;
 stack<string>s1;
 //stack<string>s2;
 stack<string>s3;
@@ -195,11 +198,217 @@ void openfile(string dirname)
     m=index;
     closedir(dir);
 }
+void command_line()
+{
+    cout<<"COMMAND MODE"<<":  ";
+    cout<<kl<<endl;
+    string line,temp1,temp2,temp3;
+    cout<<"$"<<" ";
+    int n,i,ren;
+    while(getline(cin, line))
+    {
+        cout<<"$"<<" ";
+        n=line.size();
+        i=0;
+        temp2="";
+        while(line[i]!=' ')
+        {
+            temp1=line[i];
+            temp2+=temp1;
+            i++;
+        }
+        i++;
+        temp3=kl;
+        if(temp2=="rename")
+        {
+            while(i<n)
+            {    
+                temp2="";
+                while((line[i]!=' ') && (i<n))
+                {
+                    temp1=line[i];
+                    temp2+=temp1;
+                    i++;
+                }
+                i++;
+                vv.push_back(temp2);
+            }
+            //cout<<vv[0]<<"  "<<vv[1]<<endl;
+            temp3+="/"+vv[0];
+            vv[0]=temp3;
+            temp3="";
+            temp3=kl;
+            temp3+="/" +vv[1];
+            vv[1]=temp3;
+            ren=rename(vv[0].c_str(),vv[1].c_str());
+            vv.clear();
+            temp3="";
+        }
+
+        else if(temp2=="goto")
+        {
+            while(i<n)
+            {    
+                temp2="";
+                while((line[i]!=' ') && (i<n))
+                {
+                    temp1=line[i];
+                    temp2+=temp1;
+                    i++;
+                }
+                i++;
+                vv.push_back(temp2);
+            }
+                kl=vv[0];
+                vv.clear();
+        }
+        else if(temp2=="create_dir")
+        {
+            while(i<n)
+            {    
+                temp2="";
+                while((line[i]!=' ') && (i<n))
+                {
+                    temp1=line[i];
+                    temp2+=temp1;
+                    i++;
+                }
+                i++;
+                vv.push_back(temp2);
+            }
+            temp3="";
+            temp3+=vv[1];
+            temp3+="/";
+            temp3+=vv[0];
+            int res;
+            struct stat st = {0};
+            if(stat(temp3.c_str(),&st)==-1)
+            {
+            res=mkdir(temp3.c_str(),0777);
+            }
+            //cout<<res<<endl;
+            temp3="";
+            vv.clear();
+        }
+        else if(temp2=="create_file")
+        {
+             while(i<n)
+            {    
+                temp2="";
+                while((line[i]!=' ') && (i<n))
+                {
+                    temp1=line[i];
+                    temp2+=temp1;
+                    i++;
+                }
+                i++;
+                vv.push_back(temp2);
+            }
+            temp3="";
+            temp3+=vv[1];
+            temp3+="/";
+            temp3+=vv[0];
+            //int fd2 = open(temp3.c_str(),O_RDWR|O_CREAT,0777);
+            int fd2 = open(temp3.c_str(),O_RDWR|O_CREAT,S_IRUSR|S_IRGRP|S_IROTH);
+            if(fd2 != -1)
+            {
+                close(fd2);
+            }
+            //cout<<fd2<<endl;
+            vv.clear();
+        }
+        else if(temp2=="copy")
+        {
+            while(i<n)
+            {    
+                temp2="";
+                while((line[i]!=' ') && (i<n))
+                {
+                    temp1=line[i];
+                    temp2+=temp1;
+                    i++;
+                }
+                i++;
+                vv.push_back(temp2);
+            }
+            FILE *fp1,*fp2;
+            int k,i;
+            char c;
+            k=vv.size();
+            string tempo,temp4;
+            tempo=vv[k-1];
+            k--;
+            i=0;
+            while(k--)
+            {
+                temp4=tempo;
+                temp3=kl;
+                temp3+="/";
+                temp3+=vv[i];
+                temp4+="/";
+                temp4+=vv[i];
+                // int source=open(temp3.c_str(),O_RDONLY,0); 
+                // int dest=open(tempo.c_str(),O_WRONLY|O_CREAT/*|O_TRUNC/**/,0644);
+                // struct stat stat_source;
+                // fstat(source,&stat_source);
+                // sendfile(dest,source,0,stat_source.st_size);
+                int fd2 = open(temp4.c_str(),O_RDWR|O_CREAT,0777);
+                if(fd2 != -1)
+                {
+                    close(fd2);
+                }
+                fp1=fopen(temp3.c_str(),"r");
+                fp2=fopen(temp4.c_str(),"w");
+                while((c=fgetc(fp1))!=EOF)
+                    fputc(c,fp2);
+                fclose(fp1);
+                fclose(fp2);
+                i++;
+            }
+            vv.clear();
+        }
+        else if(temp2=="move")
+        {
+            while(i<n)
+            {    
+                temp2="";
+                while((line[i]!=' ') && (i<n))
+                {
+                    temp1=line[i];
+                    temp2+=temp1;
+                    i++;
+                }
+                i++;
+                vv.push_back(temp2);
+            }
+            int k,i,rin;
+            k=vv.size();
+            string tempo,temp4;
+            tempo=vv[k-1];
+            k--;
+            i=0;
+            while(k--)
+            {
+                temp4=tempo;
+                temp3=kl;
+                temp3+="/";
+                temp3+=vv[i];
+                temp4+="/";
+                temp4+=vv[i];
+                rin=rename(temp3.c_str(),temp4.c_str());
+                //cout<<rin<<endl;
+                i++;
+            }
+            vv.clear();
+        }
+
+    }
+}
 int main()
 {
     enableRawMode();
     RefreshScreen();
-    kl="../Downloads";
+    kl="../Documents";
     openfile(kl);
     char c;
     while(1)
@@ -265,10 +474,48 @@ int main()
         string path;
         path=v[pointerIndex][0];
         kl=path;
-        pointerIndex=0;
-        v.clear();
+        
+        // stat(kl.c_str(),&file_st));
+        // if(S_ISDIR(file_st.st_mode))
+        // {
+            pointerIndex=0;
+            v.clear();
+            RefreshScreen();
+            openfile(path);
+        // }
+        // else{
+        //     execl("/user/bin/xdg-open", "xdg-open",)
+        // }
+    }
+    else if(c==58)
+    {
+        //RefreshScreen();
+        disableRawMode();
+        command_line();
+        break;
+    }
+    else if(c==127)
+    {
+        s3.push(kl);
+        while(!s1.empty())
+            s1.pop();
+        kl=kl+"/"+"..";
         RefreshScreen();
-        openfile(path);
+        openfile(kl);
+    }
+    else if(c==104)
+    {
+        s1.push(kl);
+        // while(!s1.empty())
+        //     s1.pop();
+        const char *homedir;
+        if((homedir = getenv("HOME"))==NULL)
+        {
+            homedir=getpwuid(getuid())->pw_dir;
+        }
+        kl=homedir;
+        RefreshScreen();
+        openfile(kl);
     }
     }
 
