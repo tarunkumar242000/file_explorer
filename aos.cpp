@@ -121,7 +121,44 @@ int getWindowSize(int *rows,int *cols)
         return 0;
     }
 }
+bool resi=false;
+string fat;
+bool searchfile(string dirname,string fat)
+{
+    // dirname+="/";
+    //cout<<endl<<dirname<<" "<<fat<<endl;
+    DIR *dir=opendir(dirname.c_str());
+    if(dir==NULL)
+        return false;
+    struct dirent* entity;
+    while((entity=readdir(dir))!=NULL)
+    {
+            //cout<<endl<<dirname<<" "<<fat<<endl;
+        string fileName;
+        fileName=entity->d_name;
+        if(fileName=="." || fileName=="..") continue;
+         //cout<<fileName<<" ";
 
+        if(fileName==fat)
+        {
+            return true;
+        }
+        struct stat inode;
+        stat(dirname.c_str(), &inode);
+
+        if(S_ISDIR(inode.st_mode))
+        {
+            string path;
+            path=dirname+"/"+fileName;
+           
+            //cout<<endl<<"Rec Call:" <<path<<endl;
+            if(searchfile(path,fat))    
+                return true;
+        }
+    }
+    closedir(dir);
+    return false;
+}
 void openfile(string dirname)
 {
     DIR* dir=opendir(dirname.c_str());
@@ -401,6 +438,50 @@ void command_line()
             }
             vv.clear();
         }
+        else if(temp2=="search")
+        {
+             while(i<n)
+            {    
+                temp2="";
+                while((line[i]!=' ') && (i<n))
+                {
+                    temp1=line[i];
+                    temp2+=temp1;
+                    i++;
+                }
+                i++;
+                vv.push_back(temp2);
+            }
+            bool res;
+            fat=vv[0];
+            cout<<fat<<endl;
+            cout<<endl<<"Dir to search: "<<kl<<endl;
+
+            res=searchfile(kl,fat);
+            if(res==true)
+                cout<<"True"<<endl;
+            else
+                cout<<"False"<<endl;
+
+            vv.clear();
+            //usleep(100000000);
+        }
+        else if("delete_file")
+        {
+             while(i<n)
+            {    
+                temp2="";
+                while((line[i]!=' ') && (i<n))
+                {
+                    temp1=line[i];
+                    temp2+=temp1;
+                    i++;
+                }
+                i++;
+                vv.push_back(temp2);
+            }
+            
+        }
 
     }
 }
@@ -408,7 +489,7 @@ int main()
 {
     enableRawMode();
     RefreshScreen();
-    kl="../Documents";
+    kl="/home/coding/Documents";
     openfile(kl);
     char c;
     while(1)
