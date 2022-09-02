@@ -121,6 +121,34 @@ int getWindowSize(int *rows,int *cols)
         return 0;
     }
 }
+int fgh;
+void deletedir(string dirname)
+{
+    DIR *dir=opendir(dirname.c_str());
+    if(dir==NULL)
+        return;
+    struct dirent* entity;
+    while((entity=readdir(dir))!=NULL)
+    {
+        string fileName;
+        fileName=entity->dname;
+        if(fileName=="." || fileName=="..") continue;
+
+        struct stat inode;
+        stat(dirname.c_str(),&inode);
+
+        if(S_ISDIR(inode.st_mode))
+        {
+            string path;
+            path=dirname+"/"+fileName;
+
+            deletedir(path);
+        }
+        
+    }
+    closedir(dir);
+    fgh=remove(dirname.c_str());
+}
 bool resi=false;
 string fat;
 bool searchfile(string dirname,string fat)
@@ -455,7 +483,7 @@ void command_line()
             bool res;
             fat=vv[0];
             cout<<fat<<endl;
-            cout<<endl<<"Dir to search: "<<kl<<endl;
+            //cout<<endl<<"Dir to search: "<<kl<<endl;
 
             res=searchfile(kl,fat);
             if(res==true)
@@ -480,7 +508,40 @@ void command_line()
                 i++;
                 vv.push_back(temp2);
             }
-            
+            // string teemp,strr;
+            // strr=vv[0];
+            // int len,i;
+            // len=strr.size();
+            // i=len;
+            // while(strr[i]!='/')
+            // {
+            //     teemp.push_back(strr[i]);
+            //     i--;
+            // }
+            // reverse(teemp.begin(),teemp.end());
+            int aa;
+            if(access(vv[0].c_str(),F_OK)==0)
+            {
+                aa=remove(vv[0].c_str);
+                cout<<aa<<endl;
+            }
+            vv.clear();
+        }
+        else_if("delete_dir")
+        {
+             while(i<n)
+            {    
+                temp2="";
+                while((line[i]!=' ') && (i<n))
+                {
+                    temp1=line[i];
+                    temp2+=temp1;
+                    i++;
+                }
+                i++;
+                vv.push_back(temp2);
+            }
+            deletedir(vv[0]);
         }
 
     }
