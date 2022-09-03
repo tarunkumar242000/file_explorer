@@ -31,6 +31,7 @@ int pointerIndex = 0;
 
 vector<vector<string>>v;
 
+
 char* user(const char *file)
 {
     struct stat info;
@@ -39,6 +40,7 @@ char* user(const char *file)
     return  pw->pw_name;
 }
 
+
 char* group(const char *file)
 {
     struct stat info;
@@ -46,6 +48,7 @@ char* group(const char *file)
     struct group  *gr = getgrgid(info.st_gid);
     return gr->gr_name;
 }
+
 
 char* permissions(const char *file){
     struct stat st;
@@ -79,6 +82,7 @@ off_t fsize(string path) {
     return -1; 
 }
 
+
 string getFileCreationTime(string path) {
     struct stat attr;
     stat(path.c_str(), &attr);
@@ -88,10 +92,13 @@ string getFileCreationTime(string path) {
     return ctime(&attr.st_mtime);
 }
 
+
 void disableRawMode()
 {
     tcsetattr(STDIN_FILENO,TCSAFLUSH,&orig_termios);
 }
+
+
 void enableRawMode()
 {
     tcgetattr(STDIN_FILENO,&orig_termios);
@@ -102,11 +109,13 @@ void enableRawMode()
     tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
 }
 
+
 void RefreshScreen()
 {
     cout << "\033[H\033[2J\033[3J" ;
     
 }
+
 
 int getWindowSize(int *rows,int *cols)
 {
@@ -121,6 +130,8 @@ int getWindowSize(int *rows,int *cols)
         return 0;
     }
 }
+
+
 int fgh;
 void deletedir(string dirname)
 {
@@ -160,6 +171,8 @@ void deletedir(string dirname)
     closedir(dir);
     fgh=remove(dirname.c_str());
 }
+
+
 void copy_file(string a, string b )
 {
     int source = open(a.c_str(), O_RDONLY, 0);
@@ -173,6 +186,7 @@ void copy_file(string a, string b )
     close(source);
     close(dest);
 }
+
 
 void copy_directory(string a, string b )
 {
@@ -215,6 +229,7 @@ void copy_directory(string a, string b )
 closedir(dir);
 }
 
+
 bool resi=false;
 string fat;
 bool searchfile(string dirname,string fat)
@@ -254,12 +269,14 @@ bool searchfile(string dirname,string fat)
     return false;
 }
 
+
 int is_regular_file(const char *path)
 {
     struct stat path_stat;
     stat(path, &path_stat);
     return S_ISREG(path_stat.st_mode);
 }
+
 
 void openfile(string dirname)
 {
@@ -336,16 +353,220 @@ void openfile(string dirname)
     }
     m=index;
     closedir(dir);
+    cout<<endl<<endl<<endl;
+    cout<<"NORMAL MODE  :";
+    cout<<realpath(kl.c_str(),NULL)<<endl;
+}
+void openfile1(string dirname)
+{
+    DIR* dir=opendir(dirname.c_str());
+    off_t s;
+    char actualpath[PATH_MAX];
+    string a,b,c,dl,pp,buffer,fileName;
+    char* bo;
+    char* co;
+    char* d;
+    char* ptr;
+    char* abc;
+    if(dir==NULL)
+        return ;
+    struct dirent* entity;
+    entity=readdir(dir);
+    vector<string>v1;
+    int index = 0;
+    while(entity!=NULL)
+    {
+        //printf("%s\n",entity->d_name);
+        fileName=entity->d_name;
+        string path = dirname + "/" + entity->d_name;
+        s=fsize(path.c_str());
+        char* symlinkpath=(char*)path.c_str();
+        // strcat(path,dirname);
+        // strcat(path,"/");
+        // strcat(path,entity->d_name);
+        a=getFileCreationTime(path.c_str());
+        bo=permissions(path.c_str());
+        co=user(path.c_str());
+        d=group(path.c_str());
+        ptr=realpath(symlinkpath,actualpath);
+        // cout.setf(ios::right, ios::adjustfield);
+        // cout.width(50);
+        string fileName = entity->d_name;
+
+        // if(index == pointerIndex)   cout << ">>>\t";
+        // else    cout << "\t";
+
+        printf("%-45s", fileName.c_str());
+        printf("%s \t\t",co);
+        printf("%s \t\t",d);
+        cout << s << "KB\t\t";
+        printf("%s \t\t",bo);
+        cout << a;
+        //sprintf(buffer,%d,s);
+        // b=bo;
+        // c=co;
+        dl=fileName;
+        pp=ptr;
+        v1.push_back(pp);
+        v1.push_back(fileName);
+        // v1.push_back(c);
+        // v1.push_back(dl);
+        // v1.push_back(buffer);
+        // v1.push_back(a);
+         v.push_back(v1);
+         v1.clear();
+
+        // if((entity->d_type==DT_DIR) && (strcmp(entity->d_name,".")!=0) && (strcmp(entity->d_name,".,")!=0))
+        // {
+        //     cout<<"1"<<endl;
+        //     char path[10000]={ 0 };
+        //     char p[]={ "/"};
+        //     char c[]={ entity->d_name };
+        //     strcat(path,dirname);
+        //     strcat(path,"/");
+        //     strcat(path,entity->d_name);
+        //     openfile(path);
+        // }
+         entity=readdir(dir);
+         index++;
+    }
+    m=index;
+    closedir(dir);
+}
+
+void command_line(void);
+
+
+void normal_mode()
+{
+    openfile(kl);
+    // cout<</n/n;
+    // cout<</t/t<<"NORMAL MODE"<</t/t<<endl;
+    char c;
+    while(1)
+    {
+        c=getchar();
+        if (c == '\033') { 
+        c=getchar();
+        c=getchar(); 
+        switch(c) { 
+        case 'A':
+            if(pointerIndex==0)
+                break;
+            else
+            {
+                pointerIndex--;
+                RefreshScreen();
+                v.clear();
+                openfile(kl);
+            }
+            break;
+        case 'B':
+            if(pointerIndex==m-1)
+                break;
+            else
+            {
+                pointerIndex++;
+                RefreshScreen();
+                v.clear();
+                openfile(kl);
+            }
+            // code for arrow down
+            break;
+        case 'C':
+            if(s3.size()==0)
+                break;
+        else
+        {
+            RefreshScreen();
+            s1.push(kl);
+            kl=s3.top();
+            s3.pop();
+            openfile(kl);
+        }
+            break;
+        case 'D':
+            if(s1.size()==0)
+                break;
+        else   
+         {
+            RefreshScreen();
+            s3.push(kl);
+            kl=s1.top();
+            s1.pop();
+            openfile(kl);
+         }
+            // code for arrow left
+            break;
+    }
+        }
+    else if(c==0x0A)
+    {
+        s1.push(kl);
+        string path;
+        path=v[pointerIndex][0];
+        kl=path;
+        
+        // stat(kl.c_str(),&file_st));
+        // if(S_ISDIR(file_st.st_mode))
+        // {
+            pointerIndex=0;
+            v.clear();
+            RefreshScreen();
+            openfile(path);
+        // }
+        // else{
+        //     execl("/user/bin/xdg-open", "xdg-open",)
+        // }
+    }
+    else if(c==58)
+    {
+        //RefreshScreen();
+        disableRawMode();
+        command_line();
+        break;
+    }
+    else if(c==127)
+    {
+        s3.push(kl);
+        while(!s1.empty())
+            s1.pop();
+        kl=kl+"/"+"..";
+        RefreshScreen();
+        openfile(kl);
+    }
+    else if(c==104)
+    {
+        s1.push(kl);
+        // while(!s1.empty())
+        //     s1.pop();
+        const char *homedir;
+        if((homedir = getenv("HOME"))==NULL)
+        {
+            homedir=getpwuid(getuid())->pw_dir;
+        }
+        kl=homedir;
+        RefreshScreen();
+        openfile(kl);
+    }
+    }
 }
 void command_line()
 {
+    RefreshScreen();
+    cout<<endl<<endl<<endl;
     cout<<"COMMAND MODE"<<":  ";
     cout<<kl<<endl;
     string line,temp1,temp2,temp3;
     cout<<"$"<<" ";
     int n,i,ren;
+    char cooa;
+    const char* choio;
     while(getline(cin, line))
     {
+        choio=line.c_str();
+        (char*)choio;
+        cooa=choio[0];
         cout<<"$"<<" ";
         n=line.size();
         i=0;
@@ -399,6 +620,11 @@ void command_line()
                 vv.push_back(temp2);
             }
                 kl=vv[0];
+                RefreshScreen();
+                openfile1(kl);
+                cout<<endl<<endl<<endl;
+                cout<<"COMMAND MODE"<<":  ";
+                cout<<kl<<endl;
                 vv.clear();
         }
         else if(temp2=="create_dir")
@@ -557,7 +783,7 @@ void command_line()
             vv.clear();
             //usleep(100000000);
         }
-        else if("delete_file")
+        else if(temp2=="delete_file")
         {
              while(i<n)
             {    
@@ -590,7 +816,7 @@ void command_line()
             }
             vv.clear();
         }
-        else if("delete_dir")
+        else if(temp2=="delete_dir")
         {
              while(i<n)
             {    
@@ -607,9 +833,16 @@ void command_line()
             deletedir(vv[0]);
             vv.clear();
         }
+        else if(cooa==27)
+        {
+            enableRawMode();
+            RefreshScreen();
+            normal_mode();
+        }
 
     }
 }
+
 int main()
 {
     enableRawMode();
