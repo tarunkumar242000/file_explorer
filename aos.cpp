@@ -131,7 +131,7 @@ void deletedir(string dirname)
     while((entity=readdir(dir))!=NULL)
     {
         string fileName;
-        fileName=entity->dname;
+        fileName=entity->d_name;
         if(fileName=="." || fileName=="..") continue;
 
         struct stat inode;
@@ -144,11 +144,77 @@ void deletedir(string dirname)
 
             deletedir(path);
         }
+       else
+            {
+                string filll;
+                filll=entity->d_name;
+                if(filll=="." || filll=="..") continue;
+
+                string ppp;
+                ppp=dirname+"/"+filll;
+                int drdrd;
+                drdrd=remove(ppp.c_str());
+            }
         
     }
     closedir(dir);
     fgh=remove(dirname.c_str());
 }
+void copy_file(string a, string b )
+{
+    int source = open(a.c_str(), O_RDONLY, 0);
+    int dest = open(b.c_str(), O_WRONLY | O_CREAT /*| O_TRUNC/**/, 0644);
+
+    struct stat stat_source;
+    fstat(source, &stat_source);
+
+    sendfile(dest, source, 0, stat_source.st_size);
+
+    close(source);
+    close(dest);
+}
+
+void copy_directory(string a, string b )
+{
+    int res;
+    struct stat st = {0};
+    if(stat(b.c_str(),&st)==-1)
+    {
+        res=mkdir(b.c_str(),0777);
+    }
+    DIR *dir=opendir(a.c_str());
+    if(dir==NULL)
+        return;
+    struct dirent* entity;
+    while((entity=readdir(dir))!=NULL)
+    {
+        string fileName;
+        fileName=entity->d_name;
+        if(fileName=="." || fileName=="..") continue;
+
+        struct stat inode;
+        stat((a+"/"+fileName).c_str(), &inode);
+
+        if(S_ISDIR(inode.st_mode))
+        {
+            string path,path1;
+            path=a+"/"+fileName;
+            path1=b+"/"+fileName;
+            copy_directory(path,path1);
+        }
+        else{
+            string path,path1;
+            path=a+"/"+fileName;
+            path1=b+"/"+fileName;
+            // cout<<"path: "<<path<<endl;
+            // cout<<endl<<"path1: "<<path1<<endl;
+
+            copy_file(path,path1);
+        }
+    }
+closedir(dir);
+}
+
 bool resi=false;
 string fat;
 bool searchfile(string dirname,string fat)
@@ -187,6 +253,14 @@ bool searchfile(string dirname,string fat)
     closedir(dir);
     return false;
 }
+
+int is_regular_file(const char *path)
+{
+    struct stat path_stat;
+    stat(path, &path_stat);
+    return S_ISREG(path_stat.st_mode);
+}
+
 void openfile(string dirname)
 {
     DIR* dir=opendir(dirname.c_str());
@@ -396,9 +470,7 @@ void command_line()
                 i++;
                 vv.push_back(temp2);
             }
-            FILE *fp1,*fp2;
-            int k,i;
-            char c;
+            int k;
             k=vv.size();
             string tempo,temp4;
             tempo=vv[k-1];
@@ -412,22 +484,13 @@ void command_line()
                 temp3+=vv[i];
                 temp4+="/";
                 temp4+=vv[i];
-                // int source=open(temp3.c_str(),O_RDONLY,0); 
-                // int dest=open(tempo.c_str(),O_WRONLY|O_CREAT/*|O_TRUNC/**/,0644);
-                // struct stat stat_source;
-                // fstat(source,&stat_source);
-                // sendfile(dest,source,0,stat_source.st_size);
-                int fd2 = open(temp4.c_str(),O_RDWR|O_CREAT,0777);
-                if(fd2 != -1)
+
+                if(is_regular_file(temp3.c_str()))
+                    copy_file(temp3,temp4);
+                else
                 {
-                    close(fd2);
+                    copy_directory(temp3,temp4);
                 }
-                fp1=fopen(temp3.c_str(),"r");
-                fp2=fopen(temp4.c_str(),"w");
-                while((c=fgetc(fp1))!=EOF)
-                    fputc(c,fp2);
-                fclose(fp1);
-                fclose(fp2);
                 i++;
             }
             vv.clear();
@@ -522,12 +585,12 @@ void command_line()
             int aa;
             if(access(vv[0].c_str(),F_OK)==0)
             {
-                aa=remove(vv[0].c_str);
+                aa=remove(vv[0].c_str());
                 cout<<aa<<endl;
             }
             vv.clear();
         }
-        else_if("delete_dir")
+        else if("delete_dir")
         {
              while(i<n)
             {    
@@ -542,6 +605,7 @@ void command_line()
                 vv.push_back(temp2);
             }
             deletedir(vv[0]);
+            vv.clear();
         }
 
     }
