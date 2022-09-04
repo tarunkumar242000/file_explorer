@@ -575,6 +575,7 @@ void normal_mode()
 void command_line()
 {
     RefreshScreen();
+    openfile1(kl);
     cout<<endl<<endl<<endl;
     cout<<"COMMAND MODE"<<":  ";
     cout<<kl<<endl;
@@ -623,6 +624,11 @@ void command_line()
             vv[1]=temp3;
             ren=rename(vv[0].c_str(),vv[1].c_str());
             vv.clear();
+            RefreshScreen();
+            openfile1(kl);
+            cout<<endl<<endl<<endl;
+            cout<<"COMMAND MODE"<<":  ";
+            cout<<kl<<endl;
             temp3="";
         }
 
@@ -674,7 +680,12 @@ void command_line()
             }
             //cout<<res<<endl;
             temp3="";
-            vv.clear();
+            RefreshScreen();
+            openfile1(vv[1]);
+            cout<<endl<<endl<<endl;
+            cout<<"COMMAND MODE"<<":  ";
+            cout<<vv[1]<<endl;
+             vv.clear();
         }
         else if(temp2=="create_file")
         {
@@ -701,6 +712,11 @@ void command_line()
                 close(fd2);
             }
             //cout<<fd2<<endl;
+            RefreshScreen();
+            openfile1(vv[1]);
+            cout<<endl<<endl<<endl;
+            cout<<"COMMAND MODE"<<":  ";
+            cout<<vv[1]<<endl;
             vv.clear();
         }
         else if(temp2=="copy")
@@ -733,10 +749,22 @@ void command_line()
                 temp4+=vv[i];
 
                 if(is_regular_file(temp3.c_str()))
-                    copy_file(temp3,temp4);
+                {
+                        copy_file(temp3,temp4);
+                        RefreshScreen();
+                        openfile1(tempo);
+                        cout<<endl<<endl<<endl;
+                        cout<<"COMMAND MODE"<<":  ";
+                        cout<<tempo<<endl;
+                }
                 else
                 {
                     copy_directory(temp3,temp4);
+                    RefreshScreen();
+                    openfile1(tempo);
+                    cout<<endl<<endl<<endl;
+                    cout<<"COMMAND MODE"<<":  ";
+                    cout<<tempo<<endl;
                 }
                 i++;
             }
@@ -774,6 +802,11 @@ void command_line()
                 //cout<<rin<<endl;
                 i++;
             }
+            RefreshScreen();
+            openfile1(tempo);
+            cout<<endl<<endl<<endl;
+            cout<<"COMMAND MODE"<<":  ";
+            cout<<tempo<<endl;
             vv.clear();
         }
         else if(temp2=="search")
