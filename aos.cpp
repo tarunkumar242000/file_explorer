@@ -139,9 +139,9 @@ void deletedir(string dirname)
     if(dir==NULL)
         return;
     struct dirent* entity;
-    while((entity=readdir(dir)!=NULL))
+    while((entity=readdir(dir))!=NULL))
     {
-        if(entity->d_type == DT_DIR && strcmp(entity->d_name, ".") != 0 && strcmp(entity->dname, "..") !=0)
+        if(entity->d_type == DT_DIR && strcmp(entity->d_name, ".") != 0 && strcmp(entity->d_name, "..") !=0)
         {
             string path= dirname + "/" + entity->d_name;
             deletedir(path);
@@ -149,7 +149,7 @@ void deletedir(string dirname)
         else
         {
             string path = dirname + "/" + entity->d_name;
-            if(strcmp(entity->d_name, ".") != 0 && strcmp(entity->dname, "..") !=0)
+            if(strcmp(entity->d_name, ".") != 0 && strcmp(entity->d_name, "..") !=0)
             {
                 int fgh=remove(path.c_str());
                 cout<<fgh<<endl;
