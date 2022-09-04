@@ -502,6 +502,26 @@ void normal_mode()
         }
     else if(c==0x0A)
     {
+        if(s1.empty()==true)
+        {s1.push(kl);
+        string path;
+        path=v[pointerIndex][0];
+        kl=path;
+        
+        // stat(kl.c_str(),&file_st));
+        // if(S_ISDIR(file_st.st_mode))
+        // {
+            pointerIndex=0;
+            v.clear();
+            RefreshScreen();
+            openfile(path);
+        // }
+        // else{
+        //     execl("/user/bin/xdg-open", "xdg-open",)
+        // }
+        }
+    else if(s1.top()!=kl)
+    {
         s1.push(kl);
         string path;
         path=v[pointerIndex][0];
@@ -518,6 +538,7 @@ void normal_mode()
         // else{
         //     execl("/user/bin/xdg-open", "xdg-open",)
         // }
+    }
     }
     else if(c==58)
     {
@@ -909,6 +930,27 @@ int main()
         }
     else if(c==0x0A)
     {
+        
+    if(s1.empty()==true)
+        {s1.push(kl);
+        string path;
+        path=v[pointerIndex][0];
+        kl=path;
+        
+        // stat(kl.c_str(),&file_st));
+        // if(S_ISDIR(file_st.st_mode))
+        // {
+            pointerIndex=0;
+            v.clear();
+            RefreshScreen();
+            openfile(path);
+        // }
+        // else{
+        //     execl("/user/bin/xdg-open", "xdg-open",)
+        // }
+        }
+    else if(s1.top()!=kl)
+    {
         s1.push(kl);
         string path;
         path=v[pointerIndex][0];
@@ -925,6 +967,7 @@ int main()
         // else{
         //     execl("/user/bin/xdg-open", "xdg-open",)
         // }
+    }
     }
     else if(c==58)
     {
