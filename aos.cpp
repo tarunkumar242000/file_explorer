@@ -139,7 +139,7 @@ void deletedir(string dirname)
     if(dir==NULL)
         return;
     struct dirent* entity;
-    while((entity=readdir(dir))!=NULL))
+    while((entity=readdir(dir))!=NULL)
     {
         if(entity->d_type == DT_DIR && strcmp(entity->d_name, ".") != 0 && strcmp(entity->d_name, "..") !=0)
         {
