@@ -540,6 +540,10 @@ void normal_mode()
         RefreshScreen();
         openfile(kl);
     }
+    else if(c==113)
+    {
+        exit(0);
+    }
     }
 }
 void command_line()
@@ -869,7 +873,10 @@ void command_line()
             RefreshScreen();
             normal_mode();
         }
-
+        else if(temp2=="quit")
+        {
+            exit(0);
+        }
     }
 }
 
@@ -1017,6 +1024,10 @@ int main()
         kl=homedir;
         RefreshScreen();
         openfile(kl);
+    }
+    else if(c==113)
+    {
+        return 0;
     }
     }
 
