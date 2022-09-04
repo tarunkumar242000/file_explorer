@@ -3,7 +3,7 @@
 #include<dirent.h>
 #include<string.h>
 #include <fstream>
-#include <experimental/filesystem>
+//#include <experimental/filesystem>
 #include <vector>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -132,44 +132,33 @@ int getWindowSize(int *rows,int *cols)
 }
 
 
-int fgh;
+
 void deletedir(string dirname)
 {
     DIR *dir=opendir(dirname.c_str());
     if(dir==NULL)
         return;
     struct dirent* entity;
-    while((entity=readdir(dir))!=NULL)
+    while((entity=readdir(dir)!=NULL))
     {
-        string fileName;
-        fileName=entity->d_name;
-        if(fileName=="." || fileName=="..") continue;
-
-        struct stat inode;
-        stat(dirname.c_str(),&inode);
-
-        if(S_ISDIR(inode.st_mode))
+        if(entity->d_type == DT_DIR && strcmp(entity->d_name, ".") != 0 && strcmp(entity->dname, "..") !=0)
         {
-            string path;
-            path=dirname+"/"+fileName;
-
+            string path= dirname + "/" + entity->d_name;
             deletedir(path);
         }
-       else
+        else
+        {
+            string path = dirname + "/" + entity->d_name;
+            if(strcmp(entity->d_name, ".") != 0 && strcmp(entity->dname, "..") !=0)
             {
-                string filll;
-                filll=entity->d_name;
-                if(filll=="." || filll=="..") continue;
-
-                string ppp;
-                ppp=dirname+"/"+filll;
-                int drdrd;
-                drdrd=remove(ppp.c_str());
+                int fgh=remove(path.c_str());
+                cout<<fgh<<endl;
             }
-        
+        }
     }
     closedir(dir);
-    fgh=remove(dirname.c_str());
+    int fgg=remove(dirname.c_str());
+    cout<<fgg<<endl;
 }
 
 
