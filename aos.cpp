@@ -297,21 +297,18 @@ void openfile(string dirname)
     int index = 0;
     while(entity!=NULL)
     {
-        //printf("%s\n",entity->d_name);
+        
         fileName=entity->d_name;
         string path = dirname + "/" + entity->d_name;
         s=fsize(path.c_str());
         char* symlinkpath=(char*)path.c_str();
-        // strcat(path,dirname);
-        // strcat(path,"/");
-        // strcat(path,entity->d_name);
+       
         a=getFileCreationTime(path.c_str());
         bo=permissions(path.c_str());
         co=user(path.c_str());
         d=group(path.c_str());
         ptr=realpath(symlinkpath,actualpath);
-        // cout.setf(ios::right, ios::adjustfield);
-        // cout.width(50);
+        
         string fileName = entity->d_name;
 
         if(index == pointerIndex)   cout << ">>>\t";
@@ -323,31 +320,15 @@ void openfile(string dirname)
         cout << s << "KB\t\t";
         printf("%s \t\t",bo);
         cout << a;
-        //sprintf(buffer,%d,s);
-        // b=bo;
-        // c=co;
+       
         dl=fileName;
         pp=ptr;
         v1.push_back(pp);
         v1.push_back(fileName);
-        // v1.push_back(c);
-        // v1.push_back(dl);
-        // v1.push_back(buffer);
-        // v1.push_back(a);
          v.push_back(v1);
          v1.clear();
 
-        // if((entity->d_type==DT_DIR) && (strcmp(entity->d_name,".")!=0) && (strcmp(entity->d_name,".,")!=0))
-        // {
-        //     cout<<"1"<<endl;
-        //     char path[10000]={ 0 };
-        //     char p[]={ "/"};
-        //     char c[]={ entity->d_name };
-        //     strcat(path,dirname);
-        //     strcat(path,"/");
-        //     strcat(path,entity->d_name);
-        //     openfile(path);
-        // }
+        
          entity=readdir(dir);
          index++;
     }
@@ -376,25 +357,21 @@ void openfile1(string dirname)
     int index = 0;
     while(entity!=NULL)
     {
-        //printf("%s\n",entity->d_name);
+
         fileName=entity->d_name;
         string path = dirname + "/" + entity->d_name;
         s=fsize(path.c_str());
         char* symlinkpath=(char*)path.c_str();
-        // strcat(path,dirname);
-        // strcat(path,"/");
-        // strcat(path,entity->d_name);
+        
         a=getFileCreationTime(path.c_str());
         bo=permissions(path.c_str());
         co=user(path.c_str());
         d=group(path.c_str());
         ptr=realpath(symlinkpath,actualpath);
-        // cout.setf(ios::right, ios::adjustfield);
-        // cout.width(50);
+        
         string fileName = entity->d_name;
 
-        // if(index == pointerIndex)   cout << ">>>\t";
-        // else    cout << "\t";
+    
 
         printf("%-45s", fileName.c_str());
         printf("%s \t\t",co);
@@ -402,31 +379,15 @@ void openfile1(string dirname)
         cout << s << "KB\t\t";
         printf("%s \t\t",bo);
         cout << a;
-        //sprintf(buffer,%d,s);
-        // b=bo;
-        // c=co;
+        
         dl=fileName;
         pp=ptr;
         v1.push_back(pp);
         v1.push_back(fileName);
-        // v1.push_back(c);
-        // v1.push_back(dl);
-        // v1.push_back(buffer);
-        // v1.push_back(a);
          v.push_back(v1);
          v1.clear();
 
-        // if((entity->d_type==DT_DIR) && (strcmp(entity->d_name,".")!=0) && (strcmp(entity->d_name,".,")!=0))
-        // {
-        //     cout<<"1"<<endl;
-        //     char path[10000]={ 0 };
-        //     char p[]={ "/"};
-        //     char c[]={ entity->d_name };
-        //     strcat(path,dirname);
-        //     strcat(path,"/");
-        //     strcat(path,entity->d_name);
-        //     openfile(path);
-        // }
+        
          entity=readdir(dir);
          index++;
     }
@@ -506,38 +467,47 @@ void normal_mode()
         {s1.push(kl);
         string path;
         path=v[pointerIndex][0];
-        kl=path;
-        
-        // stat(kl.c_str(),&file_st));
-        // if(S_ISDIR(file_st.st_mode))
-        // {
+        struct stat file_st;
+        stat(path.c_str(),&file_st);
+         if(S_ISDIR(file_st.st_mode))
+         {
             pointerIndex=0;
             v.clear();
+            kl=path;
             RefreshScreen();
             openfile(path);
-        // }
-        // else{
-        //     execl("/user/bin/xdg-open", "xdg-open",)
-        // }
+        }
+        else{
+            pid_t pid=fork();
+            if(pid == 0)
+             {execl("/usr/bin/bin/xdg-open", "xdg-open",path.c_str(),(char*)NULL);
+                exit(1);
+             }
+         }
         }
     else if(s1.top()!=kl)
     {
         s1.push(kl);
         string path;
         path=v[pointerIndex][0];
-        kl=path;
-        
-        // stat(kl.c_str(),&file_st));
-        // if(S_ISDIR(file_st.st_mode))
-        // {
+        struct stat file_st;
+        stat(path.c_str(),&file_st);
+        if(S_ISDIR(file_st.st_mode))
+        {
             pointerIndex=0;
             v.clear();
+            kl=path;
             RefreshScreen();
             openfile(path);
-        // }
-        // else{
-        //     execl("/user/bin/xdg-open", "xdg-open",)
-        // }
+        }
+        else{
+            pid_t pid=fork();
+            if(pid == 0)
+            {   
+                execl("/usr/bin/xdg-open", "xdg-open",path.c_str(),(char*)NULL);
+                exit(1);
+            }
+        }
     }
     }
     else if(c==58)
@@ -578,7 +548,7 @@ void command_line()
     openfile1(kl);
     cout<<endl<<endl<<endl;
     cout<<"COMMAND MODE"<<":  ";
-    cout<<kl<<endl;
+    cout<<realpath(kl.c_str(),NULL)<<endl;
     string line,temp1,temp2,temp3;
     cout<<"$"<<" ";
     int n,i,ren;
@@ -628,7 +598,7 @@ void command_line()
             openfile1(kl);
             cout<<endl<<endl<<endl;
             cout<<"COMMAND MODE"<<":  ";
-            cout<<kl<<endl;
+            cout<<realpath(kl.c_str(),NULL)<<endl;
             temp3="";
         }
 
@@ -651,7 +621,7 @@ void command_line()
                 openfile1(kl);
                 cout<<endl<<endl<<endl;
                 cout<<"COMMAND MODE"<<":  ";
-                cout<<kl<<endl;
+                cout<<realpath(kl.c_str(),NULL)<<endl;
                 vv.clear();
         }
         else if(temp2=="create_dir")
@@ -668,6 +638,7 @@ void command_line()
                 i++;
                 vv.push_back(temp2);
             }
+            vv[1]=realpath(vv[1].c_str(),NULL);
             temp3="";
             temp3+=vv[1];
             temp3+="/";
@@ -684,7 +655,7 @@ void command_line()
             openfile1(vv[1]);
             cout<<endl<<endl<<endl;
             cout<<"COMMAND MODE"<<":  ";
-            cout<<vv[1]<<endl;
+            cout<<realpath(vv[1].c_str(),NULL)<<endl;
              vv.clear();
         }
         else if(temp2=="create_file")
@@ -701,6 +672,7 @@ void command_line()
                 i++;
                 vv.push_back(temp2);
             }
+            vv[1]=realpath(vv[1].c_str(),NULL);
             temp3="";
             temp3+=vv[1];
             temp3+="/";
@@ -716,7 +688,7 @@ void command_line()
             openfile1(vv[1]);
             cout<<endl<<endl<<endl;
             cout<<"COMMAND MODE"<<":  ";
-            cout<<vv[1]<<endl;
+            cout<<realpath(vv[1].c_str(),NULL)<<endl;
             vv.clear();
         }
         else if(temp2=="copy")
@@ -736,6 +708,7 @@ void command_line()
             int k;
             k=vv.size();
             string tempo,temp4;
+            vv[k-1]=realpath(vv[k-1].c_str(),NULL);
             tempo=vv[k-1];
             k--;
             i=0;
@@ -755,7 +728,7 @@ void command_line()
                         openfile1(tempo);
                         cout<<endl<<endl<<endl;
                         cout<<"COMMAND MODE"<<":  ";
-                        cout<<tempo<<endl;
+                        cout<<realpath(tempo.c_str(),NULL)<<endl;
                 }
                 else
                 {
@@ -764,7 +737,7 @@ void command_line()
                     openfile1(tempo);
                     cout<<endl<<endl<<endl;
                     cout<<"COMMAND MODE"<<":  ";
-                    cout<<tempo<<endl;
+                    cout<<realpath(tempo.c_str(),NULL)<<endl;
                 }
                 i++;
             }
@@ -787,6 +760,7 @@ void command_line()
             int k,i,rin;
             k=vv.size();
             string tempo,temp4;
+            vv[k-1]=realpath(vv[k-1].c_str(),NULL);
             tempo=vv[k-1];
             k--;
             i=0;
@@ -806,7 +780,7 @@ void command_line()
             openfile1(tempo);
             cout<<endl<<endl<<endl;
             cout<<"COMMAND MODE"<<":  ";
-            cout<<tempo<<endl;
+            cout<<realpath(tempo.c_str(),NULL)<<endl;
             vv.clear();
         }
         else if(temp2=="search")
@@ -825,7 +799,7 @@ void command_line()
             }
             bool res;
             fat=vv[0];
-            cout<<fat<<endl;
+            //cout<<fat<<endl;
             //cout<<endl<<"Dir to search: "<<kl<<endl;
 
             res=searchfile(kl,fat);
@@ -862,6 +836,7 @@ void command_line()
             //     i--;
             // }
             // reverse(teemp.begin(),teemp.end());
+            vv[0]=realpath(vv[0].c_str(),NULL);
             int aa;
             if(access(vv[0].c_str(),F_OK)==0)
             {
@@ -884,6 +859,7 @@ void command_line()
                 i++;
                 vv.push_back(temp2);
             }
+            vv[0]=realpath(vv[0].c_str(),NULL);
             deletedir(vv[0]);
             vv.clear();
         }
@@ -968,38 +944,48 @@ int main()
         {s1.push(kl);
         string path;
         path=v[pointerIndex][0];
-        kl=path;
-        
-        // stat(kl.c_str(),&file_st));
-        // if(S_ISDIR(file_st.st_mode))
-        // {
+        struct stat file_st;
+        stat(path.c_str(),&file_st);
+         if(S_ISDIR(file_st.st_mode))
+         {
             pointerIndex=0;
             v.clear();
+            kl=path;
             RefreshScreen();
             openfile(path);
-        // }
-        // else{
-        //     execl("/user/bin/xdg-open", "xdg-open",)
-        // }
+        }
+        else{
+            pid_t pid=fork();
+            if(pid == 0)
+             {
+                execl("/usr/bin/xdg-open", "xdg-open",path.c_str(),(char*)NULL);
+                exit(1);
+             }
+         }
         }
     else if(s1.top()!=kl)
     {
         s1.push(kl);
         string path;
         path=v[pointerIndex][0];
-        kl=path;
-        
-        // stat(kl.c_str(),&file_st));
-        // if(S_ISDIR(file_st.st_mode))
-        // {
+        struct stat file_st;
+        stat(path.c_str(),&file_st);
+        if(S_ISDIR(file_st.st_mode))
+        {
             pointerIndex=0;
             v.clear();
+            kl=path;
             RefreshScreen();
             openfile(path);
-        // }
-        // else{
-        //     execl("/user/bin/xdg-open", "xdg-open",)
-        // }
+        }
+        else{
+            pid_t pid=fork();
+            if(pid==0)
+            {   
+                execl("/usr/bin/xdg-open", "xdg-open",path.c_str(),(char*)NULL);
+                exit(1);
+            }
+        }
     }
     }
     else if(c==58)
@@ -1035,18 +1021,5 @@ int main()
     }
 
         
-
-    // int n,m;
-    // n=v.size();
-    // m=v[0].size();
-    // for(int i=0;i<n;i++)
-    // {
-    //     for(int j=0;j<m;j++)
-    //     {
-    //         cout<<v[i][j]<<" ";
-    //     }
-    
-    //      cout<<endl;
-    // }
     return 0;
 }
