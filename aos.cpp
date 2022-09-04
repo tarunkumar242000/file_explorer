@@ -152,13 +152,11 @@ void deletedir(string dirname)
             if(strcmp(entity->d_name, ".") != 0 && strcmp(entity->d_name, "..") !=0)
             {
                 int fgh=remove(path.c_str());
-                cout<<fgh<<endl;
             }
         }
     }
     closedir(dir);
     int fgg=remove(dirname.c_str());
-    cout<<fgg<<endl;
 }
 
 
